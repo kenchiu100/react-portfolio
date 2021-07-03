@@ -1,58 +1,48 @@
-import React, {useEffect, useState} from "react"
+import React, { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import sanityClient from "../client.js"
 
-const Project = () => {
-    const [projectData, setProjectData] = useState(null);
+export default function Project() {
+    const [postData, setPost] = useState(null);
 
     useEffect(() => {
-        sanityClient.fetch(`*[_type == "project"]{
-            title,
-            date,
-            place,
-            description,
-            projectType,
-            link,
-            tags
-        }`).then((data) => setProjectData(data))
-        .catch(console.error);
+        sanityClient
+            .fetch(`*[_type == "post"]{
+                title,
+                slug,
+                mainImage{
+                    asset->{
+                        _id,
+                        url
+                    },
+                    alt
+                },
+            }`)
+            .then((data)=> setPost(data))
+            .catch(console.error);
     }, []);
-
     return (
         <main className="bg-green-100 min-h-screen p-12">
             <section className="container mx-auto">
-                <h1 className="text-5xl flex justify-center cursive">My Projects</h1>
-                <h2 className="text-lg text-gray-600 flex justify-center mb-12">Welcome to my projects page!</h2>
-                <section className="grid grid-cols-2 gap-8">
-                    {projectData && projectData.map((project,index) => (
-                    <article className="relative rounded-lg shadow-xl bg-white p-16">
-                        <h3 className="text-gray-800 text-3xl font-bold mb-2 hover:text-red-700">
-                            <a href={project.link} alt={project.title} target="_blank" rel="noopener norefferer">{project.title}</a>
-                        </h3>
-                        <div className="text-gray-500 text-xs space-x-4">
-                            <span>
-                                <strong className="font-bold">Finished on</strong>:{" "}
-                                {new Date(project.date).toLocaleDateString()}
+                <h1 className="text-5xl flex justify-center cursive">Blog Posts Page</h1>
+                <h2 className="text-lg text-gray-600 flex justify-center mb-12">Welcome to my page of blog posts</h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {postData && postData.map((post,index) => (
+                    <article>
+                        <Link to={"/project/" + post.slug.current} key={post.slug.current}>
+                        <span className="block h-64 relative rounded shadow leading-snug bg-white border-l-8 border-green-400" key={index}>
+                            <img src={post.mainImage.asset.url} alt={post.mainImage.alt} className="w-full h-full rounded-r object-cover absolute"/>
+                            <span className="block relative h-full flex justify-end items-end pr-4 pb-4">
+                                <h3 className="text-gray-800 text-lg font-blod px-3 py-4 bg-red-700 text-red-100 bg-opacity-75 rounded">
+                                    {post.title}
+                                </h3>
                             </span>
-                            <span>
-                                <strong className="font-bold">Company</strong>:{" "}
-                                {project.place}
-                            </span>
-                            <span>
-                                <strong className="font-bold">Type</strong>:{" "}
-                                {project.projectType}
-                            </span>
-                            <p className="my-6 text-lg text-gray-700 leading-relaxed">{project.description}</p>
-                            <a href={project.link} rel="noopener noreferrer" target="_blank" className="text-red-500 font-bold hover:underline hover:text-red-400 text-xl">
-                                View The Project{" "}
-                            <span role="img" aria-label="right pointer">👉</span>
-                            </a>
-                        </div>
+                        </span>
+                        </Link>
                     </article>
                     ))}
-                </section>
+                </div>
             </section>
         </main>
     )
 }
-
-export default Project;

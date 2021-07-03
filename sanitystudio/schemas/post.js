@@ -32,6 +32,14 @@ export default {
       },
     },
     {
+      name: 'demoImage',
+      title: 'Demo image',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+    },
+    {
       name: 'publishedAt',
       title: 'Published at',
       type: 'datetime',
